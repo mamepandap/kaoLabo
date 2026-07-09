@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>推し顔ラボ フェイスチャート</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+  /* ============================================================
+     推し顔ラボ 4軸フェイスチャート  v3
+     ・DATA を書き換えるだけ (value 1〜5 / 1=左寄り 3=中間 5=右寄り)
+     ・左ラベルは 子供 / 曲線 / 目元 / 静 固定
+     ・上部ボタンで [縦型] / [横型 Twitterサムネ] を切替 → 各々スクショ
+     ============================================================ */
+
+  @import url('https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700&family=Noto+Sans+JP:wght@400;500;700;800&display=swap');
+
+  :root{
+    --paper:#f7eef0;
+    --ink:#4a3b44;
+    --sub:#9a8590;
+    --line:#e3d2d8;
+    --accent:#c9758c;
+    --accent-soft:#e9c9d3;
+    --card:#fffafb;
+    --gold:#c9a86a;
+    --g:'Noto Sans JP',sans-serif;      /* ゴシック(重要部分) */
+    --round:'Zen Maru Gothic',sans-serif;/* 丸ゴシック(ブランド等) */
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{
+    background:#ece0e4;font-family:var(--g);
+    display:flex;flex-direction:column;align-items:center;
+    padding:24px 16px 60px;min-height:100vh;
+    overflow-x:hidden; /* 縮小前カードが一瞬でも横スクロールを生まないように */
+  }
+
+  /* 画面幅に収めるための縮小ラッパー。
+     内側の .card は常に本来のpxサイズを維持し、transform:scaleで表示だけ縮める。
+     → 保存(saveImg)時は scale を一時解除してフル解像度で書き出す。 */
+  .scale-wrap{position:relative;}
+  .scale-wrap .card{transform-origin: top left;}
+
+  /* 切替ボタン */
+  .toolbar{display:flex;gap:8px;margin-bottom:22px;}
+  .toolbar button{
+    font-family:var(--g);font-weight:700;font-size:13px;color:var(--accent);
+    background:#fff;border:1.5px solid var(--accent);border-radius:999px;
+    padding:8px 20px;cursor:pointer;transition:.15s;letter-spacing:.04em;
+  }
+  .toolbar button.active{background:var(--accent);color:#fff;}
+
+  .stage{display:none;}
+  .stage.show{display:block;}
+
+  /* 共通パーツ ------------------------------------------------ */
+  .brand{font-family:var(--round);font-weight:700;color:var(--accent);}
+  .brand small{display:block;font-family:var(--g);color:var(--sub);font-weight:500;}
+  .no{font-family:var(--g);font-weight:800;color:#fff;background:var(--accent);
+      border-radius:999px;letter-spacing:.06em;box-shadow:0 3px 8px rgba(201,117,140,.4);}
+  .pname{font-family:var(--g);font-weight:800;color:var(--ink);letter-spacing:.02em;line-height:1.1;}
+  .pmeta{font-family:var(--g);color:var(--sub);font-weight:500;letter-spacing:.06em;}
+  .lbl{font-family:var(--g);font-weight:700;color:var(--ink);letter-spacing:.02em;line-height:1;}
+  .lbl.dim{color:var(--sub);font-weight:500;}
+  .desc{font-family:var(--g);color:var(--sub);font-weight:400;line-height:1.25;}
+  .ptype{font-family:var(--g);font-weight:800;color:var(--accent);letter-spacing:.03em;}
+  .ptype span{display:block;font-weight:500;color:var(--sub);letter-spacing:.28em;}
+  .mark{font-family:var(--round);color:var(--sub);}
+
+  .rail{position:absolute;left:0;right:0;background:var(--line);border-radius:3px;}
+  .ticks{position:absolute;left:0;right:0;display:flex;justify-content:space-between;}
+  .ticks i{background:var(--line);border-radius:2px;}
+  .fill{position:absolute;left:0;border-radius:3px;
+      background:linear-gradient(90deg,var(--accent-soft),var(--accent));}
+  .dot{position:absolute;border-radius:50%;background:#fff;border:4px solid var(--accent);
+      box-shadow:0 3px 9px rgba(201,117,140,.5);transform:translateX(-50%);}
+  .card{position:relative;overflow:hidden;
+      background:radial-gradient(120% 90% at 15% 0%, #fffafb 0%, var(--paper) 60%, #f1e2e7 100%);
+      box-shadow:0 18px 50px rgba(120,80,95,.22), inset 0 0 0 1.5px #fff;}
+  .card::before{content:"";position:absolute;inset:0;
+      background-image:radial-gradient(rgba(201,117,140,.05) 1px, transparent 1px);
+      background-size:11px 11px;pointer-events:none;}
+  .head{display:flex;justify-content:space-between;align-items:flex-start;position:relative;z-index:1;}
+  .name{position:relative;z-index:1;}
+  .axes{position:relative;z-index:1;display:flex;flex-direction:column;}
+  .axis .labels{display:flex;justify-content:space-between;align-items:flex-end;}
+  .axis .side{max-width:44%;}
+  .axis .side.r{text-align:right;}
+  .track{position:relative;display:flex;align-items:center;}
+  .foot{position:relative;z-index:1;display:flex;justify-content:space-between;align-items:flex-end;}
+
+  /* ===== 縦型 (540x600) ===== */
+  #vcard{width:540px;height:600px;border-radius:26px;padding:36px 40px 30px;display:flex;flex-direction:column;}
+  #vcard .brand{font-size:16px;letter-spacing:.14em;}
+  #vcard .brand small{font-size:10px;letter-spacing:.28em;margin-top:3px;}
+  #vcard .no{font-size:13.5px;padding:6px 15px;}
+  #vcard .name{margin-top:20px;}
+  #vcard .pname{font-size:37px;}
+  #vcard .pmeta{font-size:13.5px;margin-top:6px;}
+  #vcard .axes{margin-top:18px;flex:1;justify-content:center;gap:19px;}
+  #vcard .axis .labels{margin-bottom:9px;}
+  #vcard .track{width:80%;margin:0 auto;}
+  #vcard .lbl{font-size:17.5px;}
+  #vcard .desc{font-size:11.5px;margin-top:4px;}
+  #vcard .track{height:16px;}
+  #vcard .rail{height:3px;} #vcard .ticks i{width:2px;height:9px;} #vcard .fill{height:3px;}
+  #vcard .dot{width:19px;height:19px;}
+  #vcard .foot{margin-top:18px;}
+  #vcard .ptype{font-size:18px;} #vcard .ptype span{font-size:10px;margin-bottom:2px;}
+  #vcard .mark{font-size:11px;letter-spacing:.14em;}
+
+  /* ===== 横型 Twitterサムネ (640x360, 16:9) ===== */
+  #hcard{width:640px;height:360px;border-radius:20px;padding:24px 36px 24px 32px;display:grid;
+      grid-template-columns:214px 1fr;grid-template-rows:1fr auto;column-gap:18px;}
+  #hcard .head{grid-column:1;grid-row:1;display:flex;flex-direction:column;
+      justify-content:flex-start;align-items:flex-start;gap:11px;min-width:0;}
+  #hcard .brand{font-size:15px;letter-spacing:.1em;}
+  #hcard .brand small{font-size:9px;letter-spacing:.24em;margin-top:3px;}
+  #hcard .no{font-size:12px;padding:4px 12px;align-self:flex-start;}
+  #hcard .name{margin-top:2px;min-width:0;}
+  #hcard .pname{font-size:31px;white-space:nowrap;}
+  #hcard .pmeta{font-size:12px;margin-top:6px;}
+  #hcard .ptype{font-size:15px;margin-top:14px;} #hcard .ptype span{font-size:8.5px;margin-bottom:2px;}
+  #hcard .axes{grid-column:2;grid-row:1 / span 2;justify-content:center;gap:13px;
+      border-left:1px solid var(--line);padding-left:20px;padding-right:8px;min-width:0;}
+  #hcard .axis .labels{margin-bottom:6px;}
+  #hcard .track{width:80%;margin:0 auto;}
+  #hcard .lbl{font-size:15px;}
+  #hcard .desc{font-size:10px;margin-top:3px;}
+  #hcard .track{height:14px;}
+  #hcard .rail{height:2.5px;} #hcard .ticks i{width:1.5px;height:8px;} #hcard .fill{height:2.5px;}
+  #hcard .dot{width:16px;height:16px;border-width:3px;}
+  #hcard .foot{grid-column:1;grid-row:2;justify-content:flex-start;}
+  #hcard .mark{font-size:10px;letter-spacing:.12em;}
+</style>
+</head>
+<body>
+
+  <div class="toolbar">
+    <button id="btnV" class="active" onclick="show('v')">縦型</button>
+    <button id="btnH" onclick="show('h')">横型（Twitterサムネ）</button>
+    <button id="btnSave" onclick="saveImg()" style="border-color:#c9a86a;color:#c9a86a;">画像で保存</button>
+  </div>
+
+  <!-- 縦型 -->
+  <div class="stage show" id="stageV">
+    <div class="scale-wrap" id="wrapV">
+    <div class="card" id="vcard">
+      <div class="head">
+        <div class="brand">推し顔ラボ<small>OSHI-GAO LABO</small></div>
+        <div class="no vno">#000</div>
+      </div>
+      <div class="name">
+        <h1 class="pname vname">名前</h1>
+        <div class="pmeta vmeta">グループ / 年齢</div>
+      </div>
+      <div class="axes vaxes"></div>
+      <div class="foot">
+        <div class="ptype"><span>FACE TYPE</span><div class="vtype">タイプ名</div></div>
+        <div class="mark">@oshigao_labo</div>
+      </div>
+    </div>
+    </div>
+  </div>
+
+  <!-- 横型 -->
+  <div class="stage" id="stageH">
+    <div class="scale-wrap" id="wrapH">
+    <div class="card" id="hcard">
+      <div class="head">
+        <div>
+          <div class="brand">推し顔ラボ<small>OSHI-GAO LABO</small></div>
+        </div>
+        <div class="no hno">#000</div>
+        <div class="name">
+          <h1 class="pname hname">名前</h1>
+          <div class="pmeta hmeta">グループ / 年齢</div>
+        </div>
+        <div class="ptype"><span>FACE TYPE</span><div class="htype">タイプ名</div></div>
+      </div>
+      <div class="axes haxes"></div>
+      <div class="foot"><div class="mark">@oshigao_labo</div></div>
+    </div>
+    </div>
+  </div>
+
+<script>
+  /* ============================================================
+     ▼▼▼ ここだけ書き換える ▼▼▼
+     value: 1〜5  (1=左ラベル寄り / 3=中間 / 5=右ラベル寄り)
+     左ラベルは 子供 / 曲線 / 目元 / 静 固定
+     ============================================================ */
+  const DATA = {
+    no:   "#011",
+    name: "齋藤なぎさ",
+    meta: "元=LOVE ／ 23歳",
+    type: "小悪魔美人型",
+    axes: [
+      { left:"子供顔", ldesc:"幼さが主役",         right:"大人顔", rdesc:"余裕が主役",       value:4 },
+      { left:"曲線",   ldesc:"まるくやわらかい",   right:"直線",   rdesc:"シャープで端正",   value:2 },
+      { left:"目元",   ldesc:"視線は目にいく",     right:"口元",   rdesc:"視線は口にいく",   value:4 },
+      { left:"静",     ldesc:"止まった1枚が完成形", right:"動",    rdesc:"動いた瞬間が最強", value:2 },
+    ]
+  };
+  /* ▲▲▲ 書き換えここまで ▲▲▲ */
+
+  function fill(prefix){
+    document.querySelector('.'+prefix+'no').textContent   = DATA.no;
+    document.querySelector('.'+prefix+'name').textContent = DATA.name;
+    document.querySelector('.'+prefix+'meta').textContent = DATA.meta;
+    document.querySelector('.'+prefix+'type').textContent = DATA.type;
+    const ax = document.querySelector('.'+prefix+'axes');
+    ax.innerHTML='';
+    DATA.axes.forEach(a=>{
+      const pct=((a.value-1)/4)*100;
+      const ld=a.value<3?'':'dim', rd=a.value>3?'':'dim';
+      const el=document.createElement('div');el.className='axis';
+      el.innerHTML=`
+        <div class="labels">
+          <div class="side l"><div class="lbl ${ld}">${a.left}</div><div class="desc">${a.ldesc}</div></div>
+          <div class="side r"><div class="lbl ${rd}">${a.right}</div><div class="desc">${a.rdesc}</div></div>
+        </div>
+        <div class="track">
+          <div class="rail"></div>
+          <div class="ticks"><i></i><i></i><i></i><i></i><i></i></div>
+          <div class="fill" style="width:${pct}%"></div>
+          <div class="dot" style="left:${pct}%"></div>
+        </div>`;
+      ax.appendChild(el);
+    });
+  }
+  fill('v'); fill('h');
+
+  // 横型: 名前が長い場合はフォントを自動縮小して見切れ防止
+  (function(){
+    const el=document.querySelector('.hname');
+    const n=(DATA.name||'').length;
+    if(n>=6) el.style.fontSize='25px';
+    else if(n>=5) el.style.fontSize='27px';
+  })();
+
+  function show(which){
+    document.getElementById('stageV').classList.toggle('show',which==='v');
+    document.getElementById('stageH').classList.toggle('show',which==='h');
+    document.getElementById('btnV').classList.toggle('active',which==='v');
+    document.getElementById('btnH').classList.toggle('active',which==='h');
+    fitAll();
+  }
+
+  // ===== 画面幅に収まるよう縮小表示 (1画面フィット) =====
+  // card 自体のpxサイズは変えず、ラッパーに transform:scale をかけて見た目だけ縮める。
+  // ラッパーの高さ/幅も縮小後サイズに合わせるので、余白やスクロールが出ない。
+  function fitOne(wrapId, cardId){
+    const wrap = document.getElementById(wrapId);
+    const card = document.getElementById(cardId);
+    const naturalW = card.offsetWidth;
+    const naturalH = card.offsetHeight;
+    const available = Math.min(window.innerWidth - 32, 560); // 左右16pxずつの余白を確保
+    const scale = Math.min(1, available / naturalW);
+    card.style.transform = `scale(${scale})`;
+    wrap.style.width  = (naturalW*scale) + 'px';
+    wrap.style.height = (naturalH*scale) + 'px';
+  }
+  function fitAll(){
+    fitOne('wrapV','vcard');
+    fitOne('wrapH','hcard');
+  }
+  window.addEventListener('resize', fitAll);
+  window.addEventListener('load', fitAll);
+  fitAll();
+
+  // ===== 画像で保存 (表示中のカードをPNG化) =====
+  // 画面フィット用の scale を一時的に外し、本来のpxサイズ(フル解像度)でキャプチャする
+  async function saveImg(){
+    const isV = document.getElementById('stageV').classList.contains('show');
+    const el  = document.getElementById(isV ? 'vcard' : 'hcard');
+    const btn = document.getElementById('btnSave');
+    const old = btn.textContent; btn.textContent='生成中…'; btn.disabled=true;
+    const prevTransform = el.style.transform;
+    try{
+      el.style.transform = 'none';           // フィット用の縮小を解除
+      await new Promise(r=>requestAnimationFrame(r));
+      const canvas = await html2canvas(el, {scale:2, backgroundColor:null, useCORS:true});
+      const url = canvas.toDataURL('image/png');
+      const a = document.createElement('a');
+      const safe = (DATA.no||'').replace('#','') + '_' + (DATA.name||'');
+      a.download = 'oshigao_' + (isV?'tate':'yoko') + '_' + safe + '.png';
+      a.href = url; a.click();
+    }catch(e){ alert('保存に失敗しました。ネット接続のあるブラウザで開いてください。'); }
+    el.style.transform = prevTransform;      // 表示用の縮小を元に戻す
+    btn.textContent=old; btn.disabled=false;
+  }
+</script>
+</body>
+</html>
