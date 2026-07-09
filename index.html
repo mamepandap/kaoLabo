@@ -70,8 +70,6 @@
   .rail{position:absolute;left:0;right:0;background:var(--line);border-radius:3px;}
   .ticks{position:absolute;left:0;right:0;display:flex;justify-content:space-between;}
   .ticks i{background:var(--line);border-radius:2px;}
-  .fill{position:absolute;left:0;border-radius:3px;
-      background:linear-gradient(90deg,var(--accent-soft),var(--accent));}
   .dot{position:absolute;border-radius:50%;background:#fff;border:4px solid var(--accent);
       box-shadow:0 3px 9px rgba(201,117,140,.5);transform:translateX(-50%);}
   .card{position:relative;overflow:hidden;
@@ -103,7 +101,7 @@
   #vcard .lbl{font-size:17.5px;}
   #vcard .desc{font-size:11.5px;margin-top:4px;}
   #vcard .track{height:16px;}
-  #vcard .rail{height:3px;} #vcard .ticks i{width:2px;height:9px;} #vcard .fill{height:3px;}
+  #vcard .rail{height:3px;} #vcard .ticks i{width:2px;height:9px;}
   #vcard .dot{width:19px;height:19px;}
   #vcard .foot{margin-top:18px;}
   #vcard .ptype{font-size:18px;} #vcard .ptype span{font-size:10px;margin-bottom:2px;}
@@ -128,7 +126,7 @@
   #hcard .lbl{font-size:15px;}
   #hcard .desc{font-size:10px;margin-top:3px;}
   #hcard .track{height:14px;}
-  #hcard .rail{height:2.5px;} #hcard .ticks i{width:1.5px;height:8px;} #hcard .fill{height:2.5px;}
+  #hcard .rail{height:2.5px;} #hcard .ticks i{width:1.5px;height:8px;}
   #hcard .dot{width:16px;height:16px;border-width:3px;}
   #hcard .foot{grid-column:1;grid-row:2;justify-content:flex-start;}
   #hcard .mark{font-size:10px;letter-spacing:.12em;}
@@ -223,7 +221,6 @@
         <div class="track">
           <div class="rail"></div>
           <div class="ticks"><i></i><i></i><i></i><i></i><i></i></div>
-          <div class="fill" style="width:${pct}%"></div>
           <div class="dot" style="left:${pct}%"></div>
         </div>`;
       ax.appendChild(el);
