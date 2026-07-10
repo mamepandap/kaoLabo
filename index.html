@@ -50,6 +50,26 @@
   }
   .toolbar button.active{background:var(--accent);color:#fff;}
 
+  /* バックナンバー切替(プルダウン+ギャラリー) */
+  .gallery{width:100%;max-width:900px;margin-bottom:20px;}
+  .gallery-select{display:block;width:100%;max-width:320px;margin:0 auto 14px;
+      font-family:var(--g);font-weight:700;font-size:13px;color:var(--ink);
+      background:#fff;border:1.5px solid var(--line);border-radius:12px;
+      padding:9px 14px;cursor:pointer;appearance:none;
+      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%239a8590'%3E%3Cpath fill-rule='evenodd' d='M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z' clip-rule='evenodd'/%3E%3C/svg%3E");
+      background-repeat:no-repeat;background-position:right 12px center;background-size:16px;}
+  .gallery-row{display:flex;gap:10px;overflow-x:auto;padding:4px 2px 10px;}
+  .gallery-chip{flex:0 0 auto;display:flex;flex-direction:column;align-items:flex-start;gap:2px;
+      background:#fff;border:1.5px solid var(--line);border-radius:14px;padding:10px 14px;
+      cursor:pointer;min-width:118px;transition:.15s;}
+  .gallery-chip:hover{border-color:var(--accent-soft);}
+  .gallery-chip.active{border-color:var(--accent);background:var(--paper);
+      box-shadow:0 4px 12px rgba(201,117,140,.25);}
+  .gallery-chip .gno{font-family:var(--g);font-weight:800;font-size:10.5px;color:var(--accent);letter-spacing:.05em;}
+  .gallery-chip .gname{font-family:var(--g);font-weight:800;font-size:13px;color:var(--ink);}
+  .gallery-chip .gtype{font-family:var(--g);font-weight:500;font-size:10px;color:var(--sub);}
+  .gallery-empty{font-family:var(--g);font-size:12.5px;color:var(--sub);text-align:center;padding:8px;}
+
   .stage{display:none;}
   .stage.show{display:block;}
 
@@ -160,6 +180,12 @@
 </head>
 <body>
 
+  <!-- バックナンバー切替(プルダウン+ギャラリー) -->
+  <div class="gallery" id="gallery">
+    <select class="gallery-select" id="gallerySelect"></select>
+    <div class="gallery-row" id="galleryRow"></div>
+  </div>
+
   <div class="toolbar">
     <button id="btnV" class="active" onclick="show('v')">縦型</button>
     <button id="btnH" onclick="show('h')">横型（Twitterサムネ）</button>
@@ -216,62 +242,60 @@
 
 <script>
   /* ============================================================
-     ▼▼▼ ここだけ書き換える ▼▼▼
-     value: 1〜5  (1=左ラベル寄り / 3=中間 / 5=右ラベル寄り)
-     左ラベルは 子供 / 曲線 / 目元 / 静 固定
+     エントリーデータは data/entries.json から読み込む(バックナンバー切替対応)。
+     新規エントリー追加時はこのファイルを直接編集せず、entries.json に追記する。
      ============================================================ */
-  const DATA = {
-    no:   "#012",
-    name: "花坂環",
-    meta: "JamsCollection ／ 21歳",
-    type: "血色ドール型",
-    axes: [
-      { left:"子供顔", ldesc:"幼さが主役",         right:"大人顔", rdesc:"余裕が主役",       value:2 },
-      { left:"曲線",   ldesc:"まるくやわらかい",   right:"直線",   rdesc:"シャープで端正",   value:1 },
-      { left:"目元",   ldesc:"視線は目にいく",     right:"口元",   rdesc:"視線は口にいく",   value:2 },
-      { left:"静",     ldesc:"止まった1枚が完成形", right:"動",    rdesc:"動いた瞬間が最強", value:2 },
-    ],
-    detail: [
-      { heading: "前髪", type: "chart", items: [
-          { left:"前髪重め", right:"前髪軽め", value:1, text:"輪郭をすっぽり覆うぱっつん前髪で、毛量はしっかりめ。" },
-      ]},
-      { heading: "目", type: "chart", items: [
-          { left:"つり目", right:"タレ目", value:3, text:"丸みの強い目でつり目・タレ目どちらにも極端に寄らない中間的な形。" },
-          { left:"デカ目", right:"小さめ", value:1, text:"グリッターアイシャドウとまつげのボリュームで際立つ、3枚共通の一番の武器。" },
-          { left:"寄り目", right:"離れ目", value:3, text:"目の間隔は標準的。" },
-      ]},
-      { heading: "鼻", type: "chart", items: [
-          { left:"鼻根低め", right:"鼻根高め", value:2, text:"鼻筋は細く高さも控えめ。" },
-          { left:"忘れ鼻", right:"しっかり鼻", value:1, text:"瞳の主張の強さに対して、鼻は存在を感じさせない忘れ鼻。" },
-          { left:"鼻柱目立たない", right:"鼻柱目立つ", value:2, text:"正面カットでは鼻柱の存在感はほぼない。" },
-      ]},
-      { heading: "眉", type: "chart", items: [
-          { left:"眉毛細め", right:"眉毛太め", value:3, text:"ナチュラルな平行眉で太さは標準的。" },
-          { left:"眉山なだらか", right:"眉山くっきり", value:2, text:"眉山ははっきりせず平行に近いなだらかな形。" },
-      ]},
-      { heading: "口", type: "chart", items: [
-          { left:"薄い唇", right:"ぷっくり唇", value:4, text:"3枚とも艶と血色感のあるふっくらとした唇で仕上げられている。" },
-          { left:"口角下がり", right:"口角上がり", value:4, text:"ケーキを持つカットなど、笑顔で口角が上がった表情が多い。" },
-          { left:"口たて長", right:"口よこ長", value:3, text:"標準的な口の形。" },
-      ]},
-      { heading: "輪郭・配置", type: "chart", items: [
-          { left:"頬骨低め", right:"頬骨高め", value:2, text:"頬骨の張りは目立たず、高い位置の丸チークが頬全体を覆う。" },
-          { left:"顎短め", right:"顎しっかり", value:2, text:"顎先は小さく丸みがあり、主張は控えめ。" },
-          { left:"顔の縦幅短め", right:"顔の縦幅長め", value:2, text:"ぱっつん前髪で額の見え方が最小限になり、顔の縦幅がコンパクトに見える。" },
-          { left:"パーツ密集", right:"パーツ余白多め", value:2, text:"大きな瞳・厚めの前髪・高いチークとパーツそれぞれの主張が強く、顔の中に情報量が多い。" },
-      ]},
-      { heading: "印象・見え方診断", type: "text", items: [
-          { label:"顔型", text:"丸顔に近い(曲線↔直線の軸と一致)。" },
-          { label:"ベストアングル", text:"正面。ぱっつん前髪とまんまる瞳が生む左右対称の可愛さが正面カットで最も映える。" },
-          { label:"パーソナルカラー", text:"肌は白めでほんのり赤み寄り、ブルベ夏傾向に見えるが、照明や加工の影響を受けやすいため断定はできない。" },
-      ]},
-      { heading: "メイク技法解説", type: "text", items: [
-          { label:"アイメイク", text:"グリッター系アイシャドウ+涙袋メイクでぱっちり大きな丸目を強調。まつげは根元から立ち上げるタイプ。" },
-          { label:"眉メイク", text:"平行眉をふんわり描き、顔全体のあどけない印象を底上げする方向性。" },
-      ]},
-    ]
-  };
-  /* ▲▲▲ 書き換えここまで ▲▲▲ */
+  let ENTRIES = [];
+  let DATA = null;
+
+  async function loadEntries(){
+    const res = await fetch('data/entries.json');
+    if(!res.ok) throw new Error('entries.json の取得に失敗しました');
+    ENTRIES = await res.json();
+    buildGallery();
+    selectEntry(ENTRIES.length - 1); // 最新エントリーを初期表示
+  }
+
+  function buildGallery(){
+    const sel = document.getElementById('gallerySelect');
+    const row = document.getElementById('galleryRow');
+    sel.innerHTML = '';
+    row.innerHTML = '';
+    ENTRIES.forEach((e, i)=>{
+      const opt = document.createElement('option');
+      opt.value = i;
+      opt.textContent = `${e.no}｜${e.name}`;
+      sel.appendChild(opt);
+
+      const chip = document.createElement('div');
+      chip.className = 'gallery-chip';
+      chip.dataset.index = i;
+      chip.onclick = ()=>selectEntry(i);
+      chip.innerHTML = `<span class="gno">${e.no}</span><span class="gname">${e.name}</span><span class="gtype">${e.type}</span>`;
+      row.appendChild(chip);
+    });
+    sel.onchange = ()=>selectEntry(Number(sel.value));
+  }
+
+  function selectEntry(i){
+    DATA = ENTRIES[i];
+    document.getElementById('gallerySelect').value = i;
+    document.querySelectorAll('.gallery-chip').forEach(c=>{
+      c.classList.toggle('active', Number(c.dataset.index) === i);
+    });
+    fill('v'); fill('h');
+    fillDetail();
+    shrinkLongName();
+    fitAll();
+  }
+
+  function shrinkLongName(){
+    const el = document.querySelector('.hname');
+    el.style.fontSize = '';
+    const n = (DATA.name||'').length;
+    if(n>=6) el.style.fontSize='25px';
+    else if(n>=5) el.style.fontSize='27px';
+  }
 
   function fill(prefix){
     document.querySelector('.'+prefix+'no').textContent   = DATA.no;
@@ -297,7 +321,6 @@
       ax.appendChild(el);
     });
   }
-  fill('v'); fill('h');
 
   // ===== 詳細分析パネルの描画 =====
   function fillDetail(){
@@ -331,7 +354,6 @@
       body.appendChild(sec);
     });
   }
-  fillDetail();
 
   function toggleDetail(){
     const panel = document.getElementById('detailPanel');
@@ -341,14 +363,6 @@
     btn.classList.toggle('active', willShow);
     btn.textContent = '詳細分析 ' + (willShow ? '▴' : '▾');
   }
-
-  // 横型: 名前が長い場合はフォントを自動縮小して見切れ防止
-  (function(){
-    const el=document.querySelector('.hname');
-    const n=(DATA.name||'').length;
-    if(n>=6) el.style.fontSize='25px';
-    else if(n>=5) el.style.fontSize='27px';
-  })();
 
   function show(which){
     document.getElementById('stageV').classList.toggle('show',which==='v');
@@ -401,6 +415,12 @@
     el.style.transform = prevTransform;      // 表示用の縮小を元に戻す
     btn.textContent=old; btn.disabled=false;
   }
+
+  loadEntries().catch(err=>{
+    document.getElementById('galleryRow').innerHTML =
+      '<div class="gallery-empty">エントリー一覧の読み込みに失敗しました。ローカルで直接開いている場合はサーバー経由(GitHub Pages等)で開いてください。</div>';
+    console.error(err);
+  });
 </script>
 </body>
 </html>
