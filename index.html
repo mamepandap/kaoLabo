@@ -67,6 +67,18 @@
   .detail-label{display:block;font-family:var(--g);font-weight:700;color:var(--ink);font-size:12.5px;margin-bottom:2px;}
   .detail-text{display:block;font-family:var(--g);color:var(--sub);font-size:12.5px;line-height:1.55;}
 
+  /* 拡張チャート(詳細分析パネル内の軸バー。メイン4軸チャートの縮小版) */
+  .dchart-axis{margin-bottom:14px;}
+  .dchart-axis:last-child{margin-bottom:0;}
+  .dchart-labels{display:flex;justify-content:space-between;font-family:var(--g);
+      font-weight:700;color:var(--ink);font-size:11.5px;margin-bottom:6px;}
+  .dchart-track{position:relative;height:10px;margin-bottom:6px;}
+  .dchart-rail{position:absolute;left:0;right:0;top:4px;height:2px;background:var(--line);border-radius:2px;}
+  .dchart-ticks{position:absolute;left:0;right:0;top:2.5px;display:flex;justify-content:space-between;}
+  .dchart-ticks i{width:1px;height:5px;background:var(--line);}
+  .dchart-dot{position:absolute;top:0;width:10px;height:10px;border-radius:50%;background:#fff;
+      border:2.5px solid var(--accent);transform:translateX(-50%);box-shadow:0 2px 6px rgba(201,117,140,.4);}
+
   /* 共通パーツ ------------------------------------------------ */
   .brand{font-family:var(--round);font-weight:700;color:var(--accent);}
   .brand small{display:block;font-family:var(--g);color:var(--sub);font-weight:500;}
@@ -220,21 +232,40 @@
       { left:"静",     ldesc:"止まった1枚が完成形", right:"動",    rdesc:"動いた瞬間が最強", value:2 },
     ],
     detail: [
-      { heading: "パーツ精密採点", items: [
-          { label:"瞳の形状", text:"丸型に近いぱっちり瞳。グリッターアイシャドウとまつげのボリュームで縦横ともに大きく見える。" },
-          { label:"二重・涙袋", text:"幅広の末広二重。涙袋はしっかりめでぷっくりとした立体感がある。" },
-          { label:"顔面比率", text:"目の間隔は標準的。ぱっつん前髪の影響で額の見え方が最小限になり、中顔面が短く見える比率感(写真からの目視の見立て)。" },
-          { label:"眉", text:"ナチュラルな平行眉。存在感は控えめ。" },
-          { label:"頬", text:"高い位置に丸いチークが乗り、血色感の主張が強い。" },
-          { label:"顎ライン", text:"小さく丸みのある、シャープすぎない顎。" },
-          { label:"首筋", text:"長い黒髪に隠れがちだが華奢な印象。" },
+      { heading: "前髪", type: "chart", items: [
+          { left:"前髪重め", right:"前髪軽め", value:1, text:"輪郭をすっぽり覆うぱっつん前髪で、毛量はしっかりめ。" },
       ]},
-      { heading: "印象・見え方診断", items: [
+      { heading: "目", type: "chart", items: [
+          { left:"つり目", right:"タレ目", value:3, text:"丸みの強い目でつり目・タレ目どちらにも極端に寄らない中間的な形。" },
+          { left:"デカ目", right:"小さめ", value:1, text:"グリッターアイシャドウとまつげのボリュームで際立つ、3枚共通の一番の武器。" },
+          { left:"寄り目", right:"離れ目", value:3, text:"目の間隔は標準的。" },
+      ]},
+      { heading: "鼻", type: "chart", items: [
+          { left:"鼻根低め", right:"鼻根高め", value:2, text:"鼻筋は細く高さも控えめ。" },
+          { left:"忘れ鼻", right:"しっかり鼻", value:1, text:"瞳の主張の強さに対して、鼻は存在を感じさせない忘れ鼻。" },
+          { left:"鼻柱目立たない", right:"鼻柱目立つ", value:2, text:"正面カットでは鼻柱の存在感はほぼない。" },
+      ]},
+      { heading: "眉", type: "chart", items: [
+          { left:"眉毛細め", right:"眉毛太め", value:3, text:"ナチュラルな平行眉で太さは標準的。" },
+          { left:"眉山なだらか", right:"眉山くっきり", value:2, text:"眉山ははっきりせず平行に近いなだらかな形。" },
+      ]},
+      { heading: "口", type: "chart", items: [
+          { left:"薄い唇", right:"ぷっくり唇", value:4, text:"3枚とも艶と血色感のあるふっくらとした唇で仕上げられている。" },
+          { left:"口角下がり", right:"口角上がり", value:4, text:"ケーキを持つカットなど、笑顔で口角が上がった表情が多い。" },
+          { left:"口たて長", right:"口よこ長", value:3, text:"標準的な口の形。" },
+      ]},
+      { heading: "輪郭・配置", type: "chart", items: [
+          { left:"頬骨低め", right:"頬骨高め", value:2, text:"頬骨の張りは目立たず、高い位置の丸チークが頬全体を覆う。" },
+          { left:"顎短め", right:"顎しっかり", value:2, text:"顎先は小さく丸みがあり、主張は控えめ。" },
+          { left:"顔の縦幅短め", right:"顔の縦幅長め", value:2, text:"ぱっつん前髪で額の見え方が最小限になり、顔の縦幅がコンパクトに見える。" },
+          { left:"パーツ密集", right:"パーツ余白多め", value:2, text:"大きな瞳・厚めの前髪・高いチークとパーツそれぞれの主張が強く、顔の中に情報量が多い。" },
+      ]},
+      { heading: "印象・見え方診断", type: "text", items: [
           { label:"顔型", text:"丸顔に近い(曲線↔直線の軸と一致)。" },
           { label:"ベストアングル", text:"正面。ぱっつん前髪とまんまる瞳が生む左右対称の可愛さが正面カットで最も映える。" },
           { label:"パーソナルカラー", text:"肌は白めでほんのり赤み寄り、ブルベ夏傾向に見えるが、照明や加工の影響を受けやすいため断定はできない。" },
       ]},
-      { heading: "メイク技法解説", items: [
+      { heading: "メイク技法解説", type: "text", items: [
           { label:"アイメイク", text:"グリッター系アイシャドウ+涙袋メイクでぱっちり大きな丸目を強調。まつげは根元から立ち上げるタイプ。" },
           { label:"眉メイク", text:"平行眉をふんわり描き、顔全体のあどけない印象を底上げする方向性。" },
       ]},
@@ -276,11 +307,27 @@
       const sec = document.createElement('div'); sec.className = 'detail-section';
       const h = document.createElement('div'); h.className = 'detail-heading'; h.textContent = group.heading;
       sec.appendChild(h);
-      (group.items||[]).forEach(it=>{
-        const row = document.createElement('div'); row.className = 'detail-item';
-        row.innerHTML = `<span class="detail-label">${it.label}</span><span class="detail-text">${it.text}</span>`;
-        sec.appendChild(row);
-      });
+      if(group.type === 'chart'){
+        (group.items||[]).forEach(it=>{
+          const pct = ((it.value-1)/4)*100;
+          const row = document.createElement('div'); row.className = 'dchart-axis';
+          row.innerHTML = `
+            <div class="dchart-labels"><span>${it.left}</span><span>${it.right}</span></div>
+            <div class="dchart-track">
+              <div class="dchart-rail"></div>
+              <div class="dchart-ticks"><i></i><i></i><i></i><i></i><i></i></div>
+              <div class="dchart-dot" style="left:${pct}%"></div>
+            </div>
+            <div class="detail-text">${it.text}</div>`;
+          sec.appendChild(row);
+        });
+      } else {
+        (group.items||[]).forEach(it=>{
+          const row = document.createElement('div'); row.className = 'detail-item';
+          row.innerHTML = `<span class="detail-label">${it.label}</span><span class="detail-text">${it.text}</span>`;
+          sec.appendChild(row);
+        });
+      }
       body.appendChild(sec);
     });
   }
