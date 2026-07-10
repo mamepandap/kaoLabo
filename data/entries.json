@@ -4,6 +4,7 @@
     "name": "望月もも",
     "meta": "PrettyChuu ／ 19歳",
     "type": "正統派ドーリー型",
+    "sns": { "x": "https://x.com/Momo_Pchuu", "instagram": "https://www.instagram.com/mo___ch1/" },
     "axes": [
       { "left": "子供顔", "ldesc": "幼さが主役",         "right": "大人顔", "rdesc": "余裕が主役",       "value": 3 },
       { "left": "曲線",   "ldesc": "まるくやわらかい",   "right": "直線",   "rdesc": "シャープで端正",   "value": 4 },
@@ -46,6 +47,7 @@
     "name": "小熊まむ",
     "meta": "iLiFE! ／ 21歳",
     "type": "太陽系キュート型",
+    "sns": { "x": "https://x.com/iLiFE_koguma" },
     "axes": [
       { "left": "子供顔", "ldesc": "幼さが主役",         "right": "大人顔", "rdesc": "余裕が主役",       "value": 1 },
       { "left": "曲線",   "ldesc": "まるくやわらかい",   "right": "直線",   "rdesc": "シャープで端正",   "value": 1 },
@@ -88,6 +90,7 @@
     "name": "橋本桃呼",
     "meta": "高嶺のなでしこ ／ 23歳",
     "type": "正統派プリンセス型",
+    "sns": { "x": "https://x.com/MomokoHashimoto", "instagram": "https://www.instagram.com/momoko__3628/" },
     "axes": [
       { "left": "子供顔", "ldesc": "幼さが主役",         "right": "大人顔", "rdesc": "余裕が主役",       "value": 5 },
       { "left": "曲線",   "ldesc": "まるくやわらかい",   "right": "直線",   "rdesc": "シャープで端正",   "value": 4 },
@@ -130,6 +133,7 @@
     "name": "あいす",
     "meta": "iLiFE! ／ 20歳",
     "type": "太陽系ベビーフェイス型",
+    "sns": { "x": "https://x.com/ice_icol", "instagram": "https://www.instagram.com/ice_icol/" },
     "axes": [
       { "left": "子供顔", "ldesc": "幼さが主役",         "right": "大人顔", "rdesc": "余裕が主役",       "value": 1 },
       { "left": "曲線",   "ldesc": "まるくやわらかい",   "right": "直線",   "rdesc": "シャープで端正",   "value": 1 },
@@ -172,6 +176,7 @@
     "name": "田島櫻子",
     "meta": "Onephony ／ 22歳",
     "type": "量産型パーフェクト型",
+    "sns": { "x": "https://x.com/one_sakurako", "instagram": "https://www.instagram.com/sakurako219/" },
     "axes": [
       { "left": "子供顔", "ldesc": "幼さが主役",         "right": "大人顔", "rdesc": "余裕が主役",       "value": 2 },
       { "left": "曲線",   "ldesc": "まるくやわらかい",   "right": "直線",   "rdesc": "シャープで端正",   "value": 1 },
@@ -214,6 +219,7 @@
     "name": "泉いろは",
     "meta": "HIGHSPIRITS ／ 21歳",
     "type": "清楚ナチュラル型",
+    "sns": { "x": "https://x.com/iroha_HS" },
     "axes": [
       { "left": "子供顔", "ldesc": "幼さが主役",         "right": "大人顔", "rdesc": "余裕が主役",       "value": 2 },
       { "left": "曲線",   "ldesc": "まるくやわらかい",   "right": "直線",   "rdesc": "シャープで端正",   "value": 2 },
@@ -256,6 +262,7 @@
     "name": "りる",
     "meta": "脳内パステル ／ 20歳",
     "type": "白の眠り姫型",
+    "sns": { "x": "https://x.com/nopas_riru", "instagram": "https://www.instagram.com/nopas_riru/" },
     "axes": [
       { "left": "子供顔", "ldesc": "幼さが主役",         "right": "大人顔", "rdesc": "余裕が主役",       "value": 2 },
       { "left": "曲線",   "ldesc": "まるくやわらかい",   "right": "直線",   "rdesc": "シャープで端正",   "value": 1 },
@@ -298,6 +305,7 @@
     "name": "北原もも",
     "meta": "OCHANORMA ／ 19歳",
     "type": "リップ主役型",
+    "sns": { "instagram": "https://www.instagram.com/momo_kitahara.official/" },
     "axes": [
       { "left": "子供顔", "ldesc": "幼さが主役",         "right": "大人顔", "rdesc": "余裕が主役",       "value": 3 },
       { "left": "曲線",   "ldesc": "まるくやわらかい",   "right": "直線",   "rdesc": "シャープで端正",   "value": 3 },
@@ -340,6 +348,7 @@
     "name": "市原愛弓",
     "meta": "ニアジョイ ／ 22歳",
     "type": "クールビューティー型",
+    "sns": { "x": "https://x.com/ichihara_ayumi_", "instagram": "https://www.instagram.com/ichihara_ayumi_/" },
     "axes": [
       { "left": "子供顔", "ldesc": "幼さが主役",         "right": "大人顔", "rdesc": "余裕が主役",       "value": 5 },
       { "left": "曲線",   "ldesc": "まるくやわらかい",   "right": "直線",   "rdesc": "シャープで端正",   "value": 4 },
@@ -382,6 +391,7 @@
     "name": "澪川舞香",
     "meta": "fav me ／ 24歳",
     "type": "国民的スマイル型",
+    "sns": { "x": "https://x.com/maika__fm1027", "instagram": "https://www.instagram.com/maika__fm1027/" },
     "axes": [
       { "left": "子供顔", "ldesc": "幼さが主役",         "right": "大人顔", "rdesc": "余裕が主役",       "value": 2 },
       { "left": "曲線",   "ldesc": "まるくやわらかい",   "right": "直線",   "rdesc": "シャープで端正",   "value": 1 },
@@ -424,6 +434,7 @@
     "name": "齋藤なぎさ",
     "meta": "元LOVE ／ 23歳",
     "type": "小悪魔美人型",
+    "sns": { "x": "https://x.com/saito_nagisa", "instagram": "https://www.instagram.com/saitou_nagisa/" },
     "axes": [
       { "left": "子供顔", "ldesc": "幼さが主役",         "right": "大人顔", "rdesc": "余裕が主役",       "value": 3 },
       { "left": "曲線",   "ldesc": "まるくやわらかい",   "right": "直線",   "rdesc": "シャープで端正",   "value": 2 },
@@ -466,6 +477,7 @@
     "name": "花坂環",
     "meta": "JamsCollection ／ 21歳",
     "type": "血色ドール型",
+    "sns": { "x": "https://x.com/tamaki_jams", "instagram": "https://www.instagram.com/hanatama_jams/" },
     "axes": [
       { "left": "子供顔", "ldesc": "幼さが主役",         "right": "大人顔", "rdesc": "余裕が主役",       "value": 2 },
       { "left": "曲線",   "ldesc": "まるくやわらかい",   "right": "直線",   "rdesc": "シャープで端正",   "value": 1 },
