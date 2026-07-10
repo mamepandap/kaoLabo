@@ -53,6 +53,20 @@
   .stage{display:none;}
   .stage.show{display:block;}
 
+  /* 詳細分析パネル(トグル開閉。カード本体・スクショ対象には含まれない) */
+  .detail-panel{display:none;width:100%;max-width:560px;margin-top:20px;}
+  .detail-panel.show{display:block;}
+  .detail-card{background:var(--card);border-radius:20px;padding:28px 26px;
+      box-shadow:0 10px 30px rgba(120,80,95,.15), inset 0 0 0 1.5px #fff;}
+  .detail-section{margin-bottom:22px;}
+  .detail-section:last-child{margin-bottom:0;}
+  .detail-heading{font-family:var(--g);font-weight:800;color:var(--accent);font-size:14px;
+      letter-spacing:.04em;margin-bottom:12px;padding-bottom:6px;border-bottom:1.5px solid var(--line);}
+  .detail-item{margin-bottom:10px;}
+  .detail-item:last-child{margin-bottom:0;}
+  .detail-label{display:block;font-family:var(--g);font-weight:700;color:var(--ink);font-size:12.5px;margin-bottom:2px;}
+  .detail-text{display:block;font-family:var(--g);color:var(--sub);font-size:12.5px;line-height:1.55;}
+
   /* 共通パーツ ------------------------------------------------ */
   .brand{font-family:var(--round);font-weight:700;color:var(--accent);}
   .brand small{display:block;font-family:var(--g);color:var(--sub);font-weight:500;}
@@ -138,6 +152,7 @@
     <button id="btnV" class="active" onclick="show('v')">縦型</button>
     <button id="btnH" onclick="show('h')">横型（Twitterサムネ）</button>
     <button id="btnSave" onclick="saveImg()" style="border-color:#c9a86a;color:#c9a86a;">画像で保存</button>
+    <button id="btnDetail" onclick="toggleDetail()">詳細分析 ▾</button>
   </div>
 
   <!-- 縦型 -->
@@ -182,6 +197,11 @@
     </div>
   </div>
 
+  <!-- 詳細分析パネル(トグルで開閉。カード本体のスクショには含まれない) -->
+  <div class="detail-panel" id="detailPanel">
+    <div class="detail-card" id="detailBody"></div>
+  </div>
+
 <script>
   /* ============================================================
      ▼▼▼ ここだけ書き換える ▼▼▼
@@ -198,6 +218,26 @@
       { left:"曲線",   ldesc:"まるくやわらかい",   right:"直線",   rdesc:"シャープで端正",   value:2 },
       { left:"目元",   ldesc:"視線は目にいく",     right:"口元",   rdesc:"視線は口にいく",   value:2 },
       { left:"静",     ldesc:"止まった1枚が完成形", right:"動",    rdesc:"動いた瞬間が最強", value:2 },
+    ],
+    detail: [
+      { heading: "パーツ精密採点", items: [
+          { label:"瞳の形状", text:"タレ目気味のアーモンドアイ。目尻がやわらかく下がり、まつげのボリュームで縦幅も強調される。" },
+          { label:"二重・涙袋", text:"標準〜やや幅広の末広二重。涙袋はうっすらとある程度で主張しすぎない。" },
+          { label:"顔面比率", text:"目の間隔は標準よりやや広め(目1個分ルールに近い)。中顔面(鼻下まで)がやや短めで若々しい比率感。写真からの目視の見立てで、正確な計測値ではない。" },
+          { label:"眉", text:"アーチの緩やかなやわらかい眉。存在感は控えめで顔全体の余白に馴染む。" },
+          { label:"頬", text:"高さは中間、丸みがあり血色感が乗りやすいタイプ。" },
+          { label:"顎ライン", text:"細く華奢で、シャープすぎない自然なライン。" },
+          { label:"首筋", text:"すっと長く華奢な印象(街角カットでよく見える)。" },
+      ]},
+      { heading: "印象・見え方診断", items: [
+          { label:"顔型", text:"卵型に近いが頬に丸みがあるためやや丸卵型。曲線↔直線の軸(曲線寄り)と一致。" },
+          { label:"ベストアングル", text:"斜め45度。窓辺でお茶を飲むカットのような伏し目がちの角度で、瞳の潤みと輪郭のバランスが最も映える。" },
+          { label:"パーソナルカラー", text:"肌の血色はほんのり赤み寄りで、ブルベ夏〜イエベ秋の中間的な傾向に見えるが、照明や加工の影響を受けやすいため断定はできない。" },
+      ]},
+      { heading: "メイク技法解説", items: [
+          { label:"アイメイク", text:"涙袋を控えめにしつつまつげのボリュームを重視したグラデーションで、目尻を長めに囲みタレ目の形状を強調する仕上げ。" },
+          { label:"眉メイク", text:"アーチをなだらかに描き、髪色に近いブラウン系でぼかしてナチュラルにまとめる方向性。" },
+      ]},
     ]
   };
   /* ▲▲▲ 書き換えここまで ▲▲▲ */
@@ -227,6 +267,33 @@
     });
   }
   fill('v'); fill('h');
+
+  // ===== 詳細分析パネルの描画 =====
+  function fillDetail(){
+    const body = document.getElementById('detailBody');
+    body.innerHTML = '';
+    (DATA.detail||[]).forEach(group=>{
+      const sec = document.createElement('div'); sec.className = 'detail-section';
+      const h = document.createElement('div'); h.className = 'detail-heading'; h.textContent = group.heading;
+      sec.appendChild(h);
+      (group.items||[]).forEach(it=>{
+        const row = document.createElement('div'); row.className = 'detail-item';
+        row.innerHTML = `<span class="detail-label">${it.label}</span><span class="detail-text">${it.text}</span>`;
+        sec.appendChild(row);
+      });
+      body.appendChild(sec);
+    });
+  }
+  fillDetail();
+
+  function toggleDetail(){
+    const panel = document.getElementById('detailPanel');
+    const btn = document.getElementById('btnDetail');
+    const willShow = !panel.classList.contains('show');
+    panel.classList.toggle('show', willShow);
+    btn.classList.toggle('active', willShow);
+    btn.textContent = '詳細分析 ' + (willShow ? '▴' : '▾');
+  }
 
   // 横型: 名前が長い場合はフォントを自動縮小して見切れ防止
   (function(){
