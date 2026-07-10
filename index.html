@@ -281,7 +281,9 @@
     DATA = ENTRIES[i];
     document.getElementById('gallerySelect').value = i;
     document.querySelectorAll('.gallery-chip').forEach(c=>{
-      c.classList.toggle('active', Number(c.dataset.index) === i);
+      const isActive = Number(c.dataset.index) === i;
+      c.classList.toggle('active', isActive);
+      if(isActive) c.scrollIntoView({inline:'center', block:'nearest', behavior:'smooth'});
     });
     fill('v'); fill('h');
     fillDetail();
