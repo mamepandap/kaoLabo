@@ -219,7 +219,7 @@
     "name": "泉いろは",
     "meta": "HIGHSPIRITS ／ 21歳",
     "type": "清楚ナチュラル型",
-    "sns": { "x": "https://x.com/iroha_HS" },
+    "sns": { "x": "https://x.com/iroha_HS", "instagram": "https://www.instagram.com/fairy_irh/" },
     "axes": [
       { "left": "子供顔", "ldesc": "幼さが主役",         "right": "大人顔", "rdesc": "余裕が主役",       "value": 2 },
       { "left": "曲線",   "ldesc": "まるくやわらかい",   "right": "直線",   "rdesc": "シャープで端正",   "value": 2 },
